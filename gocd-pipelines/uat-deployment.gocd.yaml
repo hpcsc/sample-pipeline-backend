@@ -1,0 +1,33 @@
+format_version: 2
+pipelines:
+  Backend_UATDeployment:
+    group: SamplePipeline
+    materials:
+      backend:
+        git: http://git-repo:3000/gocd/backend.git
+        branch: master
+      SystemTestsPassed:
+        pipeline: System_Tests
+        stage: Approve
+    stages:
+      - Deploy:
+          clean_workspace: true
+          jobs:
+            Docker_Compose_Up:
+              tasks:
+                - exec:
+                    run_if: passed
+                    command: /bin/bash
+                    arguments:
+                    - ./scripts/acceptance/docker-deploy.sh
+                    - UAT
+      - Check_Server_Up:
+          jobs:
+            Check_Server_Up:
+              tasks:
+                - exec:
+                    run_if: passed
+                    command: /bin/bash
+                    arguments:
+                    - ./scripts/acceptance/check-server-up.sh
+                    - UAT

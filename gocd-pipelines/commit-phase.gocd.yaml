@@ -1,0 +1,51 @@
+format_version: 2
+pipelines:
+  Backend_CommitPhase:
+    group: SamplePipeline
+    materials:
+      backend:
+        git: http://git-repo:3000/gocd/backend.git
+        branch: master
+    stages:
+      - Build:
+          clean_workspace: true
+          jobs:
+            Build:
+              tasks:
+                - exec:
+                    run_if: passed
+                    command: /bin/sh
+                    arguments:
+                    - ./scripts/commit/build.sh
+      - Unit_Tests:
+          jobs:
+            Run_Unit_Tests:
+              tasks:
+                - exec:
+                    run_if: passed
+                    command: /bin/sh
+                    arguments:
+                    - ./scripts/commit/unit-test.sh
+      - Build_Docker_Image:
+          jobs:
+            Build_Image:
+              tasks:
+                - exec:
+                    run_if: passed
+                    command: /bin/sh
+                    arguments:
+                    - ./scripts/commit/docker-build.sh
+                - exec:
+                    run_if: passed
+                    command: /bin/sh
+                    arguments:
+                    - ./scripts/commit/docker-tag.sh
+      - Push_To_Registry:
+          jobs:
+            Push:
+              tasks:
+                - exec:
+                    run_if: passed
+                    command: /bin/sh
+                    arguments:
+                    - ./scripts/commit/docker-push.sh
