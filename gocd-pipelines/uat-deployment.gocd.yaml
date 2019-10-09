@@ -4,7 +4,7 @@ pipelines:
     group: SamplePipeline
     materials:
       backend:
-        git: http://git-repo:3000/gocd/backend.git
+        git: http://git-repo:3000/gogs/sample-pipeline-backend.git
         branch: master
       SystemTestsPassed:
         pipeline: System_Tests
